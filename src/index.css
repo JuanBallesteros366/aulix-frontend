@@ -1,0 +1,114 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* Paleta azul de alto contraste */
+  --color-slate-950: #f5f8ff;
+  --color-slate-900: #eef3ff;
+  --color-slate-800: #e3ebfc;
+  --color-slate-700: #cdd9f3;
+  --color-slate-600: #a9b9dc;
+  --color-slate-500: #4f5f84;
+  --color-slate-400: #3d4e75;
+  --color-slate-300: #2b3c62;
+  --color-slate-200: #1a2b4f;
+  --color-slate-100: #0b1b3a;
+
+  --color-indigo-50: #e6edff;
+  --color-indigo-300: #172554;
+  --color-indigo-400: #1e3a8a;
+  --color-indigo-500: #1e40af;
+  --color-indigo-950: #0b1b3a;
+
+  --color-violet-500: #3b6fe0;
+  --color-violet-600: #2563eb;
+  --color-cyan-500: #9ddce0;
+  --color-blue-500: #adcaf5;
+  --color-emerald-300: #207657;
+  --color-emerald-500: #91d7b2;
+  --color-teal-500: #a6ded4;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light;
+    background: #f5f8ff;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 16% -8%, rgb(30 64 175 / 0.12), transparent 30rem),
+      radial-gradient(circle at 92% 16%, rgb(147 187 255 / 0.30), transparent 25rem), #f5f8ff;
+    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button,
+  a {
+    cursor: pointer;
+  }
+}
+
+@layer utilities {
+  .button-focus {
+    outline: none;
+  }
+
+  .button-focus:focus-visible {
+    box-shadow:
+      0 0 0 3px #f5f8ff,
+      0 0 0 5px #1e40af;
+  }
+
+  .login-focus {
+    outline: none;
+  }
+
+  .login-focus:focus-visible {
+    box-shadow:
+      0 0 0 2px #f5f8ff,
+      0 0 0 4px #1e40af;
+  }
+
+  /* The original dark layout used white for prominent copy. In the light
+     palette this becomes the deepest blue neutral for consistent contrast. */
+  .text-white {
+    color: var(--color-slate-100);
+  }
+
+  .bg-indigo-500.text-white,
+  .bg-emerald-500.text-white,
+  .bg-gradient-to-br.text-white {
+    color: #fff;
+  }
+}
+
+/* Enlace Saltar al contenido principal (WCAG 2.4.1 Bypass Blocks) */
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.75rem 1.25rem;
+  background-color: #0b1b3a;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 2px solid #1e40af;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
