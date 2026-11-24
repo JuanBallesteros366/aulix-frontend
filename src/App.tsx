@@ -25,12 +25,9 @@ import { UserProfile } from "./types/auth";
 
 const SESSION_STORAGE_TOKEN_KEY = "aulix_auth_token";
 const SESSION_STORAGE_USER_KEY = "aulix_auth_user";
-const OWNER_FIRESTORE_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL || "").toLowerCase();
-
-function isOwnerAccount(user?: UserProfile | null): boolean {
-  return Boolean(
-    user?.email && user.email.trim().toLowerCase() === OWNER_FIRESTORE_EMAIL
-  );
+// La pantalla de estado técnico es visible para cualquier usuario con sesión.
+function canViewStatus(user?: UserProfile | null): boolean {
+  return Boolean(user);
 }
 
 type IconName =
@@ -1126,7 +1123,7 @@ function PostLoginHeader({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const canSeeFirestore = isOwnerAccount(user);
+  const canSeeFirestore = canViewStatus(user);
 
   useEffect(() => {
     const closeMenu = (event: MouseEvent) => {
@@ -1903,7 +1900,7 @@ export function App() {
       return;
     }
 
-    if (currentPath === "/firestore" && !isOwnerAccount(currentUser)) {
+    if (currentPath === "/firestore" && !canViewStatus(currentUser)) {
       navigateTo("/dashboard");
       return;
     }
@@ -2000,7 +1997,7 @@ export function App() {
       {currentPath === "/firestore" &&
         currentUser &&
         authToken &&
-        isOwnerAccount(currentUser) && (
+        canViewStatus(currentUser) && (
           <FirestoreStatusPage
             user={currentUser}
             navigateTo={navigateTo}
