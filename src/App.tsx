@@ -125,13 +125,90 @@ function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
 }
 
 const AVATAR_OPTIONS = [
-  { id: "INI", label: "Iniciales", badge: "IN" },
-  { id: "🎓", label: "Académico", badge: "🎓" },
-  { id: "🚀", label: "Explorador", badge: "🚀" },
-  { id: "📚", label: "Lector", badge: "📚" },
-  { id: "💡", label: "Innovador", badge: "💡" },
-  { id: "⚡", label: "Constante", badge: "⚡" },
+  { id: "INI", label: "Iniciales" },
+  { id: "avatar-1", label: "Avatar 1" },
+  { id: "avatar-2", label: "Avatar 2" },
+  { id: "avatar-3", label: "Avatar 3" },
+  { id: "avatar-4", label: "Avatar 4" },
+  { id: "avatar-5", label: "Avatar 5" },
 ];
+
+const isImageAvatar = (value?: string) => Boolean(value && /^avatar-[1-5]$/.test(value));
+
+function AvatarBadge({
+  avatar,
+  initials,
+  className = "size-10 rounded-xl text-sm",
+}: {
+  avatar?: string;
+  initials: string;
+  className?: string;
+}) {
+  if (isImageAvatar(avatar)) {
+    return (
+      <img
+        src={`/avatars/${avatar}.png`}
+        alt=""
+        aria-hidden="true"
+        className={`${className.replace(/\b(rounded-\S+|shadow-\S+)/g, "")} shrink-0 rounded-full bg-transparent object-cover`}
+      />
+    );
+  }
+  return (
+    <span
+      className={`grid shrink-0 place-items-center bg-gradient-to-br from-indigo-400 to-violet-600 font-bold text-white ${className}`}
+      aria-hidden="true"
+    >
+      {avatar || initials}
+    </span>
+  );
+}
+
+function AvatarPicker({
+  value,
+  onChange,
+  initials,
+  legend,
+  hint,
+}: {
+  value: string;
+  onChange: (id: string) => void;
+  initials: string;
+  legend: string;
+  hint?: string;
+}) {
+  return (
+    <fieldset>
+      <legend className="mb-1.5 block text-sm font-bold text-slate-200">{legend}</legend>
+      {hint && <p className="mb-2 text-sm text-slate-400">{hint}</p>}
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+        {AVATAR_OPTIONS.map((item) => {
+          const isSelected = value === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onChange(item.id)}
+              aria-pressed={isSelected}
+              aria-label={`Avatar ${item.label}`}
+              className={`login-focus flex items-center justify-center rounded-xl border p-2 transition ${
+                isSelected
+                  ? "border-indigo-500 bg-indigo-50 ring-2 ring-indigo-500/30"
+                  : "border-slate-600 bg-white hover:border-slate-500"
+              }`}
+            >
+              <AvatarBadge
+                avatar={item.id === "INI" ? undefined : item.id}
+                initials={initials}
+                className="size-12 rounded-full text-sm"
+              />
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
 
 function GoogleMark() {
   return (
@@ -162,7 +239,7 @@ function FieldErrorAlert({ id, message }: { id: string; message?: string }) {
     <p
       id={id}
       role="alert"
-      className="mt-1.5 flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold leading-snug text-red-700"
+      className="mt-1.5 flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold leading-snug text-red-700"
     >
       <span
         className="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-red-600 text-[10px] text-[#fff]"
@@ -212,7 +289,8 @@ function LoginPage({
 
   const computedInitials =
     `${firstName.trim().charAt(0)}${lastName.trim().charAt(0)}`.toUpperCase() || "AU";
-  const resolvedAvatar = computedInitials;
+  const [avatarChoice, setAvatarChoice] = useState("INI");
+  const resolvedAvatar = avatarChoice === "INI" ? computedInitials : avatarChoice;
 
   const clearFieldError = (field: keyof FieldErrors) => {
     setFieldErrors((prev) => {
@@ -584,16 +662,11 @@ function LoginPage({
 
         <section className="rounded-3xl border border-slate-700/80 bg-slate-800/90 p-5 shadow-2xl shadow-black/10 sm:p-8">
           <div className="mb-7 text-center">
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-indigo-400">
-              {mode === "login" ? "Bienvenido a Aulix" : "Únete a Aulix"}
-            </p>
             <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-              {mode === "login" ? "Iniciar sesión" : "Crear una cuenta"}
+              {mode === "login" ? "Iniciar sesión en Aulix" : "Crear una cuenta en Aulix"}
             </h1>
             <p className="mt-2 text-sm text-slate-400">
-              {mode === "login"
-                ? "Ingresa con tu correo o Google"
-                : "Regístrate con tu correo o Google"}
+              {mode === "login" ? "Ingresa con Google" : "Regístrate con Google"}
             </p>
           </div>
 
@@ -609,7 +682,7 @@ function LoginPage({
 
           <div className="my-6 flex items-center gap-3" aria-hidden="true">
             <div className="h-px flex-1 bg-slate-600" />
-            <span className="text-xs font-medium text-slate-500">
+            <span className="text-sm font-medium text-slate-500">
               {mode === "login" ? "o ingresa con tu correo" : "o regístrate con tu correo"}
             </span>
             <div className="h-px flex-1 bg-slate-600" />
@@ -725,18 +798,18 @@ function LoginPage({
                       }`}
                     />
                   </div>
-                  <p id="username-help" className="mt-1 text-xs text-slate-400">
+                  <p id="username-help" className="mt-1 text-sm text-slate-400">
                     Utiliza solo números, letras, guiones o puntos.
                   </p>
                   {checkingUsername && (
-                    <p role="status" className="mt-1 text-xs font-semibold text-slate-300">
+                    <p role="status" className="mt-1 text-sm font-semibold text-slate-300">
                       Verificando disponibilidad...
                     </p>
                   )}
                   {usernameAvailableMsg && !fieldErrors.username && (
                     <p
                       role="status"
-                      className="mt-1.5 flex items-center gap-1.5 text-xs font-bold text-emerald-300"
+                      className="mt-1.5 flex items-center gap-1.5 text-sm font-bold text-emerald-300"
                     >
                       <Icon name="check" size={15} /> {usernameAvailableMsg}
                     </p>
@@ -744,6 +817,16 @@ function LoginPage({
                   <FieldErrorAlert
                     id="username-error"
                     message={fieldErrors.username}
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <AvatarPicker
+                    value={avatarChoice}
+                    onChange={setAvatarChoice}
+                    initials={computedInitials}
+                    legend="Avatar"
+                    hint="Escoge un avatar para tu perfil."
                   />
                 </div>
 
@@ -803,7 +886,7 @@ function LoginPage({
                 placeholder={
                   mode === "login"
                     ? "Ingresa tu contraseña"
-                    : "Mínimo 8 caracteres con letras y números"
+                    : "Crea tu contraseña"
                 }
                 aria-invalid={!!fieldErrors.password || !!fieldErrors.general}
                 aria-describedby={
@@ -811,7 +894,9 @@ function LoginPage({
                     ? "password-error"
                     : fieldErrors.general
                       ? "auth-error"
-                      : undefined
+                      : mode === "register"
+                        ? "password-help"
+                        : undefined
                 }
                 className={`login-focus h-13 w-full rounded-xl border bg-white pl-11 pr-12 text-[15px] text-slate-100 placeholder:text-slate-500 hover:border-slate-500 ${
                   fieldErrors.password || fieldErrors.general
@@ -830,12 +915,17 @@ function LoginPage({
               </button>
             </div>
             <FieldErrorAlert id="password-error" message={fieldErrors.password} />
+            {mode === "register" && (
+              <p id="password-help" className="mt-1 text-sm text-slate-400">
+                Mínimo 8 caracteres, con letras y números.
+              </p>
+            )}
             {mode === "login" && (
               <div className="mt-2 flex justify-end">
                 <button
                   type="button"
                   onClick={recoverPassword}
-                  className="login-focus rounded text-xs font-bold text-indigo-300 underline-offset-4 hover:text-indigo-400 hover:underline"
+                  className="login-focus rounded text-sm font-bold text-indigo-300 underline-offset-4 hover:text-indigo-400 hover:underline"
                 >
                   ¿Has olvidado la contraseña?
                 </button>
@@ -901,7 +991,7 @@ function LoginPage({
           </p>
         </section>
 
-        <p className="mt-6 text-center text-xs leading-relaxed text-slate-500">
+        <p className="mt-6 text-center text-sm leading-relaxed text-slate-500">
           {mode === "login"
             ? "Al continuar, aceptas los términos de uso y la política de privacidad de Aulix."
             : "Al crear tu cuenta, aceptas los términos de uso y la política de privacidad de Aulix."}
@@ -1105,7 +1195,6 @@ function CompleteUsernamePage({
           </div>
         </section>
       </main>
-      <SiteFooter />
     </div>
   );
 }
@@ -1123,7 +1212,6 @@ function PostLoginHeader({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const canSeeFirestore = canViewStatus(user);
 
   useEffect(() => {
     const closeMenu = (event: MouseEvent) => {
@@ -1150,7 +1238,7 @@ function PostLoginHeader({
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-800/90 bg-slate-950/85 backdrop-blur-xl">
-      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-h-[72px] max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:flex-nowrap sm:py-0 sm:px-6 lg:px-8">
         <a
           href="/dashboard"
           onClick={(e) => {
@@ -1164,14 +1252,14 @@ function PostLoginHeader({
           <span className="text-lg font-extrabold tracking-tight text-white">Aulix</span>
         </a>
 
-        <div className="flex items-center gap-2 sm:gap-4">
-          <nav aria-label="Navegación privada" className="flex items-center gap-1">
+        <div className="contents sm:flex sm:items-center sm:gap-4">
+          <nav aria-label="Navegación privada" className="order-last flex w-full items-center gap-1 overflow-x-auto pb-1 sm:order-none sm:w-auto sm:pb-0">
             {[
               { path: "/dashboard", label: "Panel" },
               { path: "/sala", label: "Sala" },
               { path: "/perfil", label: "Perfil" },
               { path: "/ayuda", label: "Ayuda" },
-              ...(canSeeFirestore ? [{ path: "/firestore", label: "Estado técnico" }] : []),
+              { path: "/firestore", label: "Estado técnico" },
             ].map((item) => (
               <a
                 key={item.path}
@@ -1181,7 +1269,7 @@ function PostLoginHeader({
                   navigateTo(item.path);
                 }}
                 aria-current={currentPath === item.path ? "page" : undefined}
-                className={`button-focus rounded-lg px-3 py-2 text-xs font-bold transition ${
+                className={`button-focus inline-flex w-32 shrink-0 items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-xs font-bold transition ${
                   currentPath === item.path
                     ? "bg-indigo-500 text-white shadow-sm"
                     : "text-slate-300 hover:bg-slate-800 hover:text-white"
@@ -1192,10 +1280,6 @@ function PostLoginHeader({
             ))}
           </nav>
 
-          <p className="hidden text-sm text-slate-400 sm:block">
-            ¡Hola, <strong className="font-semibold text-slate-200">{user.firstName}</strong>!
-          </p>
-
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setMenuOpen((open) => !open)}
@@ -1204,9 +1288,7 @@ function PostLoginHeader({
               aria-expanded={menuOpen}
               aria-label={`Menú de cuenta de ${fullName}`}
             >
-              <span className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-indigo-400 to-violet-600 text-sm font-bold text-white shadow-lg shadow-indigo-950">
-                {avatarBadge}
-              </span>
+              <AvatarBadge avatar={user.avatar} initials={avatarBadge} className="size-10 rounded-xl text-sm shadow-lg shadow-indigo-950" />
               <Icon name="chevron" size={15} />
             </button>
             {menuOpen && (
@@ -1275,12 +1357,7 @@ function DashboardPage({
         >
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
             <div className="flex items-center gap-4">
-              <span
-                className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-indigo-400 to-violet-600 text-lg font-extrabold text-white shadow-lg shadow-indigo-500/25"
-                aria-hidden="true"
-              >
-                {avatarBadge}
-              </span>
+              <AvatarBadge avatar={user.avatar} initials={avatarBadge} className="size-14 rounded-2xl text-lg font-extrabold shadow-lg shadow-indigo-500/25" />
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-indigo-400">
                   Panel principal
@@ -1291,23 +1368,8 @@ function DashboardPage({
                 >
                   ¡Bienvenido, {fullName}!
                 </h1>
-                <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-400">
-                  {user.username && (
-                    <span className="font-bold text-indigo-300">@{user.username}</span>
-                  )}
-                  <span aria-hidden="true">•</span>
-                  <span>{user.email}</span>
-                </div>
               </div>
             </div>
-
-            <button
-              type="button"
-              onClick={onLogout}
-              className="button-focus inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-600 bg-white px-4 text-sm font-bold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700"
-            >
-              <Icon name="logout" size={17} /> Cerrar sesión
-            </button>
           </div>
         </section>
 
@@ -1339,19 +1401,6 @@ function DashboardPage({
         </section>
       </main>
     </div>
-  );
-}
-
-function SiteFooter() {
-  return (
-    <footer className="border-t border-slate-700/80 bg-slate-900 py-6">
-      <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 px-4 text-xs text-slate-400 sm:flex-row sm:px-6 lg:px-8">
-        <p>
-          <strong className="font-bold text-slate-200">Aulix</strong> · Tu salón de estudio colaborativo
-        </p>
-        <p>Proyecto integrador · Universidad del Valle</p>
-      </div>
-    </footer>
   );
 }
 
@@ -1421,12 +1470,7 @@ function ProfilePage({
           aria-labelledby="datos-titulo"
           className="mt-6 flex items-center gap-4 rounded-3xl border border-slate-700/80 bg-slate-800/90 p-6"
         >
-          <span
-            className="grid size-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-indigo-400 to-violet-600 text-xl font-extrabold text-white"
-            aria-hidden="true"
-          >
-            {user.avatar || initials}
-          </span>
+          <AvatarBadge avatar={user.avatar} initials={initials} className="size-16 rounded-2xl text-xl font-extrabold" />
           <div className="min-w-0">
             <h2 id="datos-titulo" className="truncate text-lg font-bold text-white">
               {fullName}
@@ -1448,33 +1492,16 @@ function ProfilePage({
           <p className="mt-1 text-sm text-slate-400">
             Por defecto usamos tus iniciales. Puedes cambiarlas por otro avatar cuando quieras.
           </p>
-          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-6">
-            {AVATAR_OPTIONS.map((item) => {
-              const isSelected = choice === item.id;
-              const previewText = item.id === "INI" ? initials : item.badge;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => {
-                    setChoice(item.id);
-                    setSaved("");
-                  }}
-                  aria-pressed={isSelected}
-                  aria-label={`Avatar ${item.label}`}
-                  className={`login-focus flex flex-col items-center justify-center gap-1 rounded-xl border p-2 text-xs font-semibold transition ${
-                    isSelected
-                      ? "border-indigo-500 bg-indigo-50 text-indigo-300 ring-2 ring-indigo-500/30"
-                      : "border-slate-600 bg-white text-slate-300 hover:border-slate-500"
-                  }`}
-                >
-                  <span className="grid size-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-400 to-violet-600 text-xs font-bold text-white">
-                    {previewText}
-                  </span>
-                  <span className="truncate text-[11px]">{item.label}</span>
-                </button>
-              );
-            })}
+          <div className="mt-4">
+            <AvatarPicker
+              value={choice}
+              initials={initials}
+              legend="Elige tu avatar"
+              onChange={(id) => {
+                setChoice(id);
+                setSaved("");
+              }}
+            />
           </div>
 
           <div className="mt-4">
@@ -1494,7 +1521,6 @@ function ProfilePage({
           </button>
         </section>
       </main>
-      <SiteFooter />
     </div>
   );
 }
@@ -1543,7 +1569,6 @@ function PlaceholderPage({
           </button>
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }
@@ -1644,7 +1669,6 @@ function HelpPage({
           ))}
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }
