@@ -4,8 +4,12 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://localhost:4000
-        - VITE_REALTIME_URL=http://localhost:4001
+        # Se leen del archivo .env de esta carpeta
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:4000}
+        VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY}
+        VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN}
+        VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID}
+        VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID}
     container_name: aulix-frontend
     ports:
       - "5173:80"
