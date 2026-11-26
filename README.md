@@ -1,41 +1,53 @@
-# Frontend (`frontend`)
+# Aulix — Frontend
 
-Interfaz web colaborativa construida con **React 18 + TypeScript + Vite + Tailwind CSS**, cumpliendo con **WCAG 2.2 Nivel AA** y arquitectura desacoplada.
+Interfaz web de **Aulix, Salón de Estudio Colaborativo en Tiempo Real**, hecha con React, TypeScript, Vite y Tailwind CSS. El servidor está en otro repositorio: [aulix-backend](https://github.com/JuanBallesteros366/aulix-backend).
 
-> **Regla de Arquitectura:** El frontend **nunca** consulta Firestore directamente. Todos los datos son solicitados mediante peticiones HTTP al servicio `backend-api`.
+**En producción:** https://aulix-frontend.vercel.app
 
----
+El frontend no consulta Firestore directamente. Todos los datos llegan por la API.
 
-## Características de Accesibilidad Base
+## Pantallas
 
-- **Idioma declarado**: `<html lang="es">` en `index.html`.
-- **Regiones Semánticas (Landmarks)**: `<header>`, `<nav aria-label="...">`, `<main id="contenido-principal">`, `<footer>`.
-- **Enlace «Saltar al contenido principal»**: Primer elemento enfocable con `Tab` para omitir bloques repetitivos (WCAG 2.4.1).
-- **Título Dinámico**: Actualización automática de `document.title` según la vista activa (WCAG 2.4.2).
-- **Foco siempre visible**: Anillo `:focus-visible` de `3px` de alto contraste en todos los controles interactivos (WCAG 2.4.7 / 2.4.11).
-- **Estados accesibles para Lectores de Pantalla**: Regiones `aria-live="polite"` y `role="alert"` para anunciar estados de carga, error y éxito del dato proveniente de Firestore (WCAG 4.1.3).
+Inicio de sesión, registro, elegir nombre de usuario (ingreso con Google), panel, perfil con avatar, ayuda, estado técnico (`/firestore`), sala (en construcción) y página 404.
 
----
+## Cómo ejecutarlo
 
-## Ejecución en Desarrollo
+Necesitas Node.js 20 o superior.
 
-1. Copiar variables de entorno:
-   ```bash
-   cp .env.example .env
-   ```
-2. Instalar dependencias y levantar servidor Vite:
-   ```bash
-   npm install
-   npm run dev
-   ```
-3. Abrir `http://localhost:5173`.
+```bash
+cp .env.example .env     # completa los valores
+npm install
+npm run dev              # http://localhost:5173
+```
 
----
+Para que funcione el registro y el inicio de sesión, el backend debe estar corriendo (en local en el puerto 4000) o apuntar a la API de Render.
+
+## Variables de entorno
+
+| Variable | Valor |
+|---|---|
+| `VITE_API_URL` | URL de la API, sin barra final |
+| `VITE_FIREBASE_API_KEY` | Configuración web de Firebase |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Configuración web de Firebase |
+| `VITE_FIREBASE_PROJECT_ID` | Configuración web de Firebase |
+| `VITE_FIREBASE_APP_ID` | Configuración web de Firebase |
+
+Estos valores salen de Firebase: Configuración del proyecto, Tus apps, app web.
+
+## Docker
+
+```bash
+docker compose up --build   # http://localhost:5173
+```
+
+Usa el mismo `.env` de arriba: Docker Compose lo lee solo. Para levantar todo el sistema en local, primero arranca el backend con su `docker-compose.yml` (puerto 4000) y después este.
 
 ## Despliegue en Vercel
 
-1. Importar el repositorio de GitHub en **Vercel**.
-2. Configurar **Root Directory**: `frontend`.
-3. Añadir las variables de entorno:
-   - `VITE_API_URL`: URL pública del servicio `backend-api` en Render (ej. `https://tu-api.onrender.com`).
-   - `VITE_REALTIME_URL`: URL pública del servicio `backend-realtime` en Render.
+1. Importar el repositorio. Root Directory: `./`. Preset: Vite.
+2. Agregar las variables de entorno de la tabla.
+3. Agregar el dominio de Vercel en Firebase, Authentication, Settings, Dominios autorizados.
+
+## Accesibilidad
+
+Idioma `es` declarado, enlace para saltar al contenido, regiones semánticas, foco visible y mensajes de error y éxito anunciados a lectores de pantalla.
